@@ -1,0 +1,56 @@
+version: '3'
+
+services:
+
+  # gmapping:
+    # image: taurob/gmapping
+  #   build:
+  #     context: ./
+  #     dockerfile: Dockerfile.gmapping
+  #   command: rosrun gmapping slam_gmapping scan:=/scan_merged
+  #   network_mode: host
+
+  # cartographer:
+  #   image: taurob/cartographer
+  #   build:
+  #     context: ./
+  #     dockerfile: Dockerfile.cartographer
+  #   command: roslaunch cartographer_tracker 2d_slamming.launch --wait
+  #   network_mode: host
+
+  slam_toolbox:
+    image: taurob/slam_toolbox
+    build:
+      context: ./
+      dockerfile: Dockerfile.slam_toolbox
+    command: roslaunch ./slam_toolbox_lifelong.launch --wait
+    network_mode: host
+
+  #octomap:
+  #  image: taurob/octomap
+  #  build:
+  #    context: ./
+  #    dockerfile: Dockerfile.octomap
+  #  command: roslaunch ./octomap.launch --wait
+  #  network_mode: host
+
+  lio-sam:
+    image: taurob/lio-sam
+    build:
+      context: ./
+      dockerfile: Dockerfile.lio-sam
+    network_mode: host
+    volumes:
+      - ./src/lio-sam/launch/run.launch:/root/catkin_ws/src/LIO-SAM/launch/run.launch
+      - ./src/lio-sam/config:/root/catkin_ws/src/LIO-SAM/config
+
+  map_connector:
+    image: taurob/mapping_map_connector
+    build:
+      context: ./
+      dockerfile: Dockerfile.map_connector
+    privileged: true
+    command: python3 /app/node.py
+    network_mode: host
+    volumes:
+      - ./src/map_connector:/app

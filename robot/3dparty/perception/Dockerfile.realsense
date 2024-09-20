@@ -1,0 +1,42 @@
+# if BUILD_RELEASE="", then environment variables for the taurob will not be set
+ARG BUILD_RELEASE=1
+
+FROM ros:noetic-perception
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y ros-noetic-realsense2-camera git
+
+# Clone librealsense to get access to the udev rules and install them
+RUN git clone https://github.com/IntelRealSense/librealsense.git
+RUN mkdir -p /etc/udev/rules && cp /librealsense/config/99-realsense-libusb.rules /etc/udev/rules/99-realsense-libusb.rules
+
+## ROS environment variables for running on tracker
+# Conditionally set ros env variables if BUILD_RELEASE is not empty
+ENV ROS_MASTER_URI=${BUILD_RELEASE:+"http://10.0.0.100:11311"}
+ENV ROS_MASTER_URI=${ROS_MASTER_URI:-"http://localhost:11311"}
+
+# Add sourcing to bashrc for interactive debugging
+RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
+#RUN echo "source /catkin_ws/devel/setup.bash" >> ~/.bashrc
+
+## Delete original entrypoint and format new one
+RUN rm ros_entrypoint.sh
+
+RUN echo "#!/bin/bash" >> /ros_entrypoint.sh
+RUN echo "set -e" >> /ros_entrypoint.sh
+RUN echo "# setup ros environment" >> /ros_entrypoint.sh
+RUN echo 'source "/opt/ros/noetic/setup.bash" --' >> /ros_entrypoint.sh
+# Add sourcing of local workspace to entrypoint
+#RUN echo "source /catkin_ws/devel/setup.bash" >> /ros_entrypoint.sh
+# Set ROS_IP and ROS_HOSTNAME if we are building in release mode
+RUN if ! [[ -z "${BUILD_RELEASE}" ]]; then echo "export ROS_IP=10.0.0.100" >> /ros_entrypoint.sh; fi
+RUN if ! [[ -z "${BUILD_RELEASE}" ]]; then echo "export ROS_HOSTNAME=10.0.0.100" >> /ros_entrypoint.sh; fi
+# Recreate ROS entrypoint
+RUN echo 'exec "$@"' >> /ros_entrypoint.sh
+RUN chmod +x /ros_entrypoint.sh
+
+ENTRYPOINT ["/ros_entrypoint.sh"]
+CMD [ "roslaunch", "/app/rs_camera.launch" ]

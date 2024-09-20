@@ -1,0 +1,29 @@
+FROM ros:noetic-ros-base
+
+# SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# hadolint ignore=DL3008
+# Cartographer
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y sudo python3-wstool python3-rosdep ninja-build stow git libgmock-dev && rosdep update
+RUN mkdir -p /cartographer_ws/src && cd /cartographer_ws && wstool init src \
+    && wstool merge -t src https://raw.githubusercontent.com/cartographer-project/cartographer_ros/master/cartographer_ros.rosinstall \
+    &&  wstool update -t src && sed -i -e "s%<depend>libabsl-dev</depend>%<\!--<depend>libabsl-dev</depend>-->%g" /cartographer_ws/src/cartographer/package.xml\
+    && rosdep install --from-paths src --ignore-src --rosdistro=noetic -y && bash src/cartographer/scripts/install_abseil.sh
+RUN cd /cartographer_ws/ && /bin/bash -c '. /opt/ros/noetic/setup.bash; catkin_make_isolated --install --use-ninja -DCMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH};${PWD}/install_isolated;${PWD}/protobuf/install"'
+
+ENV ROS_MASTER_URI="http://10.0.0.100:11311"
+ENV ROS_IP="10.0.0.100"
+ENV ROS_HOSTNAME="10.0.0.100"
+
+RUN mkdir -p /catkin_ws/src && cd /catkin_ws && \
+    /bin/bash -c '. /opt/ros/noetic/setup.bash; . /cartographer_ws/install_isolated/setup.bash; catkin_make'
+COPY src/cartographer_tracker /catkin_ws/src/cartographer_tracker
+WORKDIR /catkin_ws
+RUN /bin/bash -c '. /opt/ros/noetic/setup.bash; . /cartographer_ws/install_isolated/setup.bash; catkin_make'
+WORKDIR /
+RUN sed -i '/^exec */i source "\/cartographer_ws\/install_isolated\/setup.bash"' /ros_entrypoint.sh
+RUN sed -i '/^exec */i source "\/catkin_ws\/devel\/setup.bash"' /ros_entrypoint.sh
+RUN /bin/bash -c '. /opt/ros/noetic/setup.bash; . /cartographer_ws/install_isolated/setup.bash; . /catkin_ws/devel/setup.bash; rospack profile'
+WORKDIR /catkin_ws/src/cartographer_tracker/launch
+CMD [ "roslaunch", "./2d_slamming.launch", "--wait" ]

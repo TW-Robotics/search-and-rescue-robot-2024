@@ -1,0 +1,60 @@
+<launch>
+	<arg name="cloud_in" 			default="/points_no_robot" 	doc="The input point cloud topic."/>
+	<arg name="out_scan" 			default="/pcl2scan" 		doc="The output laser scan topic."/>
+	<arg name="transform_tolerance"	default="0.01"				doc="Timeout for tf."/>
+	<arg name="min_height" 			default="0.2" 				doc="The minimum height to sample in the point cloud in meters. "/>
+	<arg name="max_height" 			default="0.5" 				doc="The maximum height to sample in the point cloud in meters."/>
+	<arg name="angle_min" 			default="-3.1415" 			doc="The minimum scan angle in radians."/>
+	<arg name="angle_max" 			default="3.1415" 			doc="The maximum scan angle in radians."/>
+	<arg name="angle_increment" 	default="0.00872664625" 	doc="Resolution of laser scan in radians per ray."/>
+	<arg name="scan_time" 			default="0.03333333333" 	doc="The scan rate in seconds."/>
+	<arg name="range_min" 			default="0.2" 				doc="The minimum ranges to return in meters."/>
+	<arg name="range_max" 			default="10.0"				doc="The maximum ranges to return in meters."/>
+	<arg name="target_frame" 		default="chassis_link" 		doc="If provided, transform the pointcloud into this frame before converting to a laser scan. Otherwise, laser scan will be generated in the same frame as the input point cloud."/>
+	<arg name="concurrency_level" 	default="1" 				doc="Number of threads to use for processing pointclouds. If 0, automatically detect number of cores and use the equivalent number of threads. Input queue size for pointclouds is tied to this parameter"/>
+	<arg name="inf_epsilon" 		default="1.0"	 			doc="?"/>
+	<arg name="use_inf" 			default="true"	 			doc="If disabled, report infinite range (no obstacle) as range_max + 1. Otherwise report infinite range as +inf. Associated with the inf_is_valid parameter for costmap_2d obstacle layers."/>
+
+	
+    <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan2">
+
+        <remap from="cloud_in" to="$(arg cloud_in)"/>
+        <remap from="scan" to="pcl2scan_left"/>
+		<param name="transform_tolerance" value="$(arg transform_tolerance)"/>
+		<param name="target_frame" value="$(arg target_frame)"/>
+		<param name="min_height" value="$(arg min_height)"/>
+		<param name="max_height" value="$(arg max_height)"/>
+		<param name="angle_min" value="0.6109"/>
+		<param name="angle_max" value="3.1415"/>
+		<param name="angle_increment" value="$(arg angle_increment)"/>
+		<param name="scan_time" value="$(arg scan_time)"/>
+		<param name="range_min" value="$(arg range_min)"/>
+		<param name="range_max" value="$(arg range_max)"/>
+		<param name="concurrency_level" value="$(arg concurrency_level)"/>
+		<param name="use_inf" value="$(arg use_inf)"/>
+		<param name="inf_epsilon" value="$(arg inf_epsilon)"/>
+
+
+    </node>
+
+	    <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
+
+        <remap from="cloud_in" to="$(arg cloud_in)"/>
+        <remap from="scan" to="pcl2scan_right"/>
+		<param name="transform_tolerance" value="$(arg transform_tolerance)"/>
+		<param name="target_frame" value="$(arg target_frame)"/>
+		<param name="min_height" value="$(arg min_height)"/>
+		<param name="max_height" value="$(arg max_height)"/>
+		<param name="angle_min" value="-3.1415"/>
+		<param name="angle_max" value="-0.6109"/>
+		<param name="angle_increment" value="$(arg angle_increment)"/>
+		<param name="scan_time" value="$(arg scan_time)"/>
+		<param name="range_min" value="$(arg range_min)"/>
+		<param name="range_max" value="$(arg range_max)"/>
+		<param name="concurrency_level" value="$(arg concurrency_level)"/>
+		<param name="use_inf" value="$(arg use_inf)"/>
+		<param name="inf_epsilon" value="$(arg inf_epsilon)"/>
+
+
+    </node>
+</launch>

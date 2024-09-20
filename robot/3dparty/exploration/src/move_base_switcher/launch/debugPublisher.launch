@@ -1,0 +1,3 @@
+<launch>
+<node pkg="move_base_switcher" type="debugPublisher.py" respawn="false" name="action_lib_switcher_debug_publisher" output="screen"/>
+</launch>

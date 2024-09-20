@@ -1,0 +1,56 @@
+<launch>
+    <arg name="frame_id"                        default="map"/>
+    <arg name="resolution"                      default="0.05"/>
+    <arg name="cloud_in"                        default="/points_no_robot"/>
+
+    <arg name="compress_map"                    default="true"/>
+    <arg name="incremental_2D_projection"       default="false"/>
+    <arg name="filter_speckles"                 default="false"/>
+    
+    <arg name="max_depth"                       default="16"/>
+
+    <arg name="filter_ground"                   default="false"/>
+    <arg name="ground_filter_angle"             default="0.15"/>
+    <arg name="ground_filter_distance"          default="0.2"/>
+    <arg name="ground_filter_plane_distance"    default="0.28"/>
+
+    <arg name="occupancy_max_z"                 default="100"/>
+    <arg name="occupancy_min_z"                 default="0.05"/>
+    <arg name="pointcloud_max_z"                default="40"/>
+    <arg name="pointcloud_min_z"                default="-10"/>
+
+    <arg name="sensor_model_max_range"          default="15"/>
+    <arg name="sensor_model_hit"                default="0.7"/>
+    <arg name="sensor_model_max"                default="0.97"/>
+    <arg name="sensor_model_min"                default="0.6"/>
+    <arg name="sensor_model_miss"               default="0.2"/>
+
+	<node pkg="octomap_server" type="octomap_server_node" name="octomap_server">
+		<remap from="cloud_in" to="$(arg cloud_in)" />
+		<!-- <param name="frame_id"      type="string"   value="$(arg frame_id)" /> -->
+		<param name="resolution"    type="double"   value="$(arg resolution)" />
+
+        <param name="compress_map"                  type="bool"      value="$(arg compress_map)"/>
+        <param name="incremental_2D_projection"     type="bool"      value="$(arg incremental_2D_projection)"/>
+        <param name="filter_speckles"               type="bool"      value="$(arg filter_speckles)"/>
+
+        <param name="max_depth"                     type="int"       value="$(arg max_depth)"/>
+
+        <param name="filter_ground"                 type="bool"      value="$(arg filter_ground)"/>
+        <param name="ground_filter_angle"           type="double"    value="$(arg ground_filter_angle)"/>
+        <param name="ground_filter_distance"        type="double"    value="$(arg ground_filter_distance)"/>
+        <param name="ground_filter_plane_distance"  type="double"    value="$(arg ground_filter_plane_distance)"/>
+
+        <param name="occupancy_max_z"          type="double"     value="$(arg occupancy_max_z)"/>
+        <param name="occupancy_min_z"          type="double"     value="$(arg occupancy_min_z)"/>
+        <param name="pointcloud_max_z"         type="double"     value="$(arg pointcloud_max_z)"/>
+        <param name="pointcloud_min_z"         type="double"     value="$(arg pointcloud_min_z)"/>
+
+        <param name="sensor_model_max_range"   type="double"     value="$(arg sensor_model_max_range)"/>
+        <param name="sensor_model_hit"         type="double"     value="$(arg sensor_model_hit)"/>
+        <param name="sensor_model_max"         type="double"     value="$(arg sensor_model_max)"/>
+        <param name="sensor_model_min"         type="double"     value="$(arg sensor_model_min)"/>
+        <param name="sensor_model_miss"        type="double"     value="$(arg sensor_model_miss)"/>
+    	
+	</node>
+</launch>

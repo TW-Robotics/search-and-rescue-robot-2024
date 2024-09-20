@@ -1,0 +1,10 @@
+input_frame: base_link
+output_frame: velodyne
+negative: true
+min_x: -0.35
+max_x: 0.6
+min_y: -0.3
+max_y: 0.3
+min_z: -0.0
+max_z: 1.5
+keep_organized: true

@@ -1,0 +1,14 @@
+FROM ros:noetic-ros-base
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# ARG VELODYNE_IP=
+# hadolint ignore=DL3008
+RUN apt-get update && rosdep update \
+    && apt-get install ros-noetic-velodyne -y --no-install-recommends\
+    && rm -rf /var/lib/apt/lists/* && apt-get clean
+ENV ROS_MASTER_URI="http://10.0.0.100:11311"
+ENV ROS_IP="10.0.0.100"
+ENV ROS_HOSTNAME="10.0.0.100"
+SHELL ["/bin/bash", "-c"]
+CMD ["roslaunch", "velodyne_pointcloud", "VLP16_points.launch", "--wait"]

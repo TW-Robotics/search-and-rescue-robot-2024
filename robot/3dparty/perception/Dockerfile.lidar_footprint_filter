@@ -1,0 +1,16 @@
+FROM ros:noetic-ros-base
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# hadolint ignore=DL3008
+RUN apt-get update && rosdep update \
+    && apt-get install ros-noetic-pcl-ros -y --no-install-recommends\
+    && rm -rf /var/lib/apt/lists/* && apt-get clean
+ENV ROS_MASTER_URI="http://10.0.0.100:11311"
+ENV ROS_IP="10.0.0.100"
+ENV ROS_HOSTNAME="10.0.0.100"
+
+WORKDIR /
+COPY src/lidar_footprint_filter /
+
+CMD ["roslaunch", "./footprint_filter.launch", "pcl_topic:=/velodyne_points", "--wait"]

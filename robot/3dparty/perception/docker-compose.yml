@@ -1,0 +1,54 @@
+version: '3'
+
+services:
+
+  # Realsense driver is very picky about usb controllers
+  #realsense_driver:
+  #  image: taurob/perception_realsense
+  #  build:
+  #    context: ./
+  #    dockerfile: Dockerfile.realsense
+  #  network_mode: host
+  #  privileged: true
+  #  volumes:
+  #    - ./src/realsense:/app
+
+  jetson_bridge:
+    image: taurob/perception_jetson_bridge
+    build:
+      context: ./
+      dockerfile: Dockerfile.jetson_bridge
+    privileged: true
+    command: python3 /app/bridge.py
+    network_mode: host
+    volumes:
+      - ./src/jetson_bridge:/app
+
+  footprint_filter:
+    build:
+      context: ./
+      dockerfile: Dockerfile.lidar_footprint_filter
+    privileged: true
+    command: roslaunch /footprint_filter.launch pcl_topic:=/velodyne_points --wait
+    network_mode: host
+
+  laser_merge:
+    image: taurob/perception_laser_merge
+    build:
+      context: ./
+      dockerfile: Dockerfile.laser_merge
+    privileged: true
+    command: roslaunch /laserscan_multi_merger.launch angle_min:=-3.1415 angle_max:=3.1358 laserscan_topics:="/scan_front /pcl2scan_right /pcl2scan_left" --wait
+    network_mode: host
+
+  pointcloud2laserscan:
+    image: taurob/pointcloud2laserscan
+    build:
+      context: ./
+      dockerfile: Dockerfile.pointcloud2laserscan
+    privileged: true
+    #command: roslaunch /pointcloud2laserscan.launch angle_min:=-3.1415 angle_max:=3.1415 min_height:=0.25 max_height:=0.5 target_frame:=chassis_link --wait
+    command: roslaunch /pointcloud2laserscan.launch min_height:=0.25 max_height:=0.5 target_frame:=chassis_link --wait
+    network_mode: host
+
+  

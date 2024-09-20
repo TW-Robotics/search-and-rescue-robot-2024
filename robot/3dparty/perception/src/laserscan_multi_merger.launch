@@ -1,0 +1,25 @@
+<launch>
+    <arg name="destination_frame" default="base_link"/>
+    <arg name="cloud_destination_topic" default="/cloud_merged"/>
+    <arg name="scan_destination_topic" default="/scan_merged"/>
+    <arg name="laserscan_topics" default="/scan_front /pcl2scan"/>
+    <arg name="angle_min" default="-2.0"/>
+    <arg name="angle_max" default="2.0"/>
+    <arg name="angle_increment" default="0.0058016"/>
+    <arg name="scan_time" default="0.333333"/>
+    <arg name="range_min" default="0.30"/>
+    <arg name="range_max" default="50.0"/>
+	
+	<node pkg="ira_laser_tools" name="laserscan_multi_merger" type="laserscan_multi_merger" output="screen">
+	<param name="destination_frame" value="$(arg destination_frame)"/>
+	<param name="cloud_destination_topic" value="$(arg cloud_destination_topic)"/>
+	<param name="scan_destination_topic" value="$(arg scan_destination_topic)"/>
+	<param name="laserscan_topics" value ="$(arg laserscan_topics)" /> <!-- LIST OF THE LASER SCAN TOPICS TO SUBSCRIBE -->
+	<param name="angle_min" value="$(arg angle_min)"/>
+	<param name="angle_max" value="$(arg angle_max)"/>
+	<param name="angle_increment" value="$(arg angle_increment)"/>
+	<param name="scan_time" value="$(arg scan_time)"/>
+	<param name="range_min" value="$(arg range_min)"/>
+	<param name="range_max" value="$(arg range_max)"/>
+	</node>
+</launch>

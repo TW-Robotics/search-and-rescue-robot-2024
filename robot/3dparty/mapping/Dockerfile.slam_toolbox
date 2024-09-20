@@ -1,0 +1,16 @@
+FROM ros:noetic-ros-base
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# hadolint ignore=DL3008
+RUN apt-get update && rosdep update \
+    && apt-get install ros-noetic-slam-toolbox -y --no-install-recommends\
+    && rm -rf /var/lib/apt/lists/* && apt-get clean
+ENV ROS_MASTER_URI="http://10.0.0.100:11311"
+ENV ROS_IP="10.0.0.100"
+ENV ROS_HOSTNAME="10.0.0.100"
+
+COPY src/slam_toolbox /slam_toolbox
+WORKDIR /slam_toolbox
+
+CMD [ "roslaunch",  "./slam_toolbox_lifelong.launch" ]

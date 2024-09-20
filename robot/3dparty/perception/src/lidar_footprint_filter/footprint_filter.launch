@@ -1,0 +1,15 @@
+<launch>
+  <arg name="pcl_topic" default="/points_raw"/>
+  <!-- PCL Manager -->
+  <node pkg="nodelet" type="nodelet" name="cropbox_filter_pcl_manager" args="manager" output="screen" />
+
+  <!--ToDo: Filter NAN points-->
+
+  <!-- A CropBox filter to avoid self-detection -->
+  <node pkg="nodelet" type="nodelet" name="self_removal" args="load pcl/CropBox cropbox_filter_pcl_manager" output="screen">
+    <remap from="~input" to="$(arg pcl_topic)" />
+    <remap from="~output" to="/points_no_robot" />
+    <rosparam file="/taurob_footprint_config.yaml" command="load"/>
+  </node>
+
+</launch>

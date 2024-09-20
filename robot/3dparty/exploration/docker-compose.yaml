@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+
+  explorer:
+    image: taurob/explorer
+    build:
+      context: ./
+      dockerfile: Dockerfile.explorer
+    network_mode: host
+    privileged: true
+    command: roslaunch move_base_switcher capsulated_explorer.launch --wait
+    volumes:
+      - ./src/move_base_switcher:/catkin_ws/src/move_base_switcher

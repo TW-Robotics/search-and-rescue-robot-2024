@@ -1,0 +1,49 @@
+# Set --build-arg BUILD_RELEASE="" to build for local testing
+ARG BUILD_RELEASE=1
+FROM ros:noetic-ros-base
+ARG BUILD_RELEASE
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Install git for explore lite cloning and python-is-python3 for convenient path managing
+RUN apt-get update && apt-get install -y git python-is-python3 --no-install-recommends
+
+# Create workspace folders
+RUN mkdir -p catkin_ws/src \
+    && cd catkin_ws/src \
+    && git clone https://github.com/hrnr/m-explore
+
+COPY ./src /catkin_ws/src
+
+# Install ros and package dependencies
+RUN apt-get update && rosdep update && rosdep install --from-paths /catkin_ws/src -i -y --rosdistro noetic
+
+# Compile workspace
+RUN /bin/bash -c "source /opt/ros/noetic/setup.bash \
+    && cd catkin_ws \
+    && catkin_make "
+
+# Cleanup
+RUN rm -rf /var/lib/apt/lists/* && apt-get clean
+
+# Conditionally set ros env variables if BUILD_RELEASE is not empty
+ENV ROS_MASTER_URI=${BUILD_RELEASE:+"http://10.0.0.100:11311"}
+ENV ROS_MASTER_URI=${ROS_MASTER_URI:-"http://localhost:11311"}
+
+## Add ros sourcing to entrypoint 
+# Remove last line from entrypoint, add local workspace sourcing and readd last line
+RUN sed -i '$ d' /ros_entrypoint.sh
+RUN echo "source /catkin_ws/devel/setup.bash" >> /ros_entrypoint.sh
+# Additionally, set ROS_IP and ROS_HOSTNAME if we are building in release mode
+#RUN if ! [[ -z "${BUILD_RELEASE}" ]]; then echo "export ROS_IP=10.0.0.100" >> /ros_entrypoint.sh; fi
+RUN if ! [[ -z "${BUILD_RELEASE}" ]]; then echo "export ROS_HOSTNAME=10.0.0.100" >> /ros_entrypoint.sh; fi
+#
+RUN echo 'exec "$@"' >> /ros_entrypoint.sh
+# Add sourcing to bashrc for interactive debugging
+RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
+RUN echo "source /catkin_ws/devel/setup.bash" >> ~/.bashrc
+
+SHELL ["/bin/bash", "-c"]
+ENTRYPOINT ["/ros_entrypoint.sh"]
+
+#CMD ["roslaunch", "move_base_switcher", "capsulated_explorer.launch", "--wait"]

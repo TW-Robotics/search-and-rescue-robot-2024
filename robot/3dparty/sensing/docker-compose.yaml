@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+
+  velodyne:
+    image: taurob/velodyne
+    build:
+      context: ./
+      dockerfile: Dockerfile.velodyne
+    privileged: true
+    command: roslaunch velodyne_pointcloud VLP16_points.launch --wait
+    network_mode: host
+
+  lord:
+    image: taurob/lord
+    build:
+      context: ./
+      dockerfile: Dockerfile.lord
+    devices: 
+      - "/dev/ttyACM0:/dev/ttyACM0"
+    command: imu_frame_id:=imu imu_data_rate:=100 --wait
+    network_mode: host
+
+  #sick:
+  #  image: taurob/sick
+  #  build:
+  #    context: ./
+  #    dockerfile: Dockerfile.sick
+  #  network_mode: host

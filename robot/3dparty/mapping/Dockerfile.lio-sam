@@ -1,0 +1,55 @@
+FROM ros:noetic-ros-base
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+# hadolint ignore=DL3008
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends build-essential software-properties-common git libopencv-dev \
+    && rosdep update && apt-get install --no-install-recommends -y \
+    ros-noetic-navigation ros-noetic-robot-localization ros-noetic-robot-state-publisher ros-noetic-cv-bridge \
+    ros-noetic-pcl* ros-noetic-std-msgs ros-noetic-sensor-msgs ros-noetic-geometry-msgs ros-noetic-nav-msgs \
+    ros-noetic-message-generation ros-noetic-visualization-msgs ros-noetic-xacro \
+    && rm -rf /var/lib/apt/lists/* && apt-get clean
+
+
+# hadolint ignore=DL3027
+RUN add-apt-repository ppa:borglab/gtsam-release-4.0 && apt-get update && \
+    apt install libgtsam-dev libgtsam-unstable-dev -y && rm -rf /var/lib/apt/lists/* && apt-get clean
+
+RUN mkdir -p /root/catkin_ws/src && \
+    /bin/bash -c '. /opt/ros/noetic/setup.bash; catkin_init_workspace'
+
+
+RUN git clone https://github.com/TixiaoShan/LIO-SAM /root/catkin_ws/src/LIO-SAM
+
+
+# Use 20.04 opencv include and change position after pcl/kdtree include
+# see: https://github.com/TixiaoShan/LIO-SAM/issues/206 and https://github.com/TixiaoShan/LIO-SAM/issues/314
+# hadolint ignore=DL3003
+RUN sed -i 's/#include <opencv\/cv.h>//g' /root/catkin_ws/src/LIO-SAM/include/utility.h \
+    && sed -i '/^#include <pcl\/kdtree\/kdtree_flann.h>/a #include <opencv2\/opencv.hpp>' /root/catkin_ws/src/LIO-SAM/include/utility.h \
+    && sed -i 's/-std=c++11/-std=c++14/g' /root/catkin_ws/src/LIO-SAM/CMakeLists.txt \
+    && cd /root/catkin_ws/ && /bin/bash -c '. /opt/ros/noetic/setup.bash; catkin_make -DCMAKE_BUILD_TYPE=Release'
+
+
+RUN sed -i '/^setup.bash*/a source "\/root\/catkin_ws\/devel\/setup.bash"' /ros_entrypoint.sh
+
+# Delete config folder, since we want to mount that at runtime
+RUN rm -rf /root/catkin_ws/src/LIO-SAM/config
+
+## Add ros sourcing to entrypoint 
+# Remove last line from entrypoint, add local workspace sourcing and readd last line
+RUN sed -i '$ d' /ros_entrypoint.sh
+RUN echo "source /root/catkin_ws/devel/setup.bash" >> /ros_entrypoint.sh
+RUN echo 'exec "$@"' >> /ros_entrypoint.sh
+ENTRYPOINT ["/ros_entrypoint.sh"]
+
+# Add sourcing to bashrc for interactive debugging
+RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
+RUN echo "source /root/catkin_ws/devel/setup.bash" >> ~/.bashrc
+
+WORKDIR /
+ENV ROS_MASTER_URI="http://10.0.0.100:11311"
+ENV ROS_IP="10.0.0.100"
+ENV ROS_HOSTNAME="10.0.0.100"
+SHELL ["/bin/bash", "-c"]
+CMD ["roslaunch", "/root/catkin_ws/src/LIO-SAM/launch/run.launch", "--wait"]

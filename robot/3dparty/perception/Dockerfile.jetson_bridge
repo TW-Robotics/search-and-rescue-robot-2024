@@ -1,0 +1,18 @@
+FROM ros:noetic-ros-core-buster
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 python3-pip python3-dev build-essential libffi-dev ros-noetic-sensor-msgs
+
+COPY ./src/jetson_bridge/requirements.txt .
+
+RUN pip3 install --upgrade pip
+
+RUN pip3 install -r requirements.txt
+    
+RUN rm -rf /var/lib/apt/lists/*
+
+ENV ROS_MASTER_URI="http://10.0.0.100:11311"
+ENV ROS_IP="10.0.0.100"
+ENV ROS_HOSTNAME="10.0.0.100"
+
+RUN mkdir /app

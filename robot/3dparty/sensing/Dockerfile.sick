@@ -1,0 +1,17 @@
+FROM ros:noetic-ros-base
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# hadolint ignore=DL3008
+RUN apt-get update && rosdep update \
+    && apt-get install ros-noetic-sick-tim -y --no-install-recommends\
+    && rm -rf /var/lib/apt/lists/* && apt-get clean
+ENV ROS_MASTER_URI="http://10.0.0.100:11311"
+ENV ROS_IP="10.0.0.100"
+ENV ROS_HOSTNAME="10.0.0.100"
+
+ENV SICK_IP_FRONT="10.0.0.112"
+ENV SICK_IP_REAR="10.0.0.111"
+
+CMD ["/bin/bash", "-c", "rosrun sick_tim sick_tim551_2050001 scan:=/scan_rear __name:=laser_rear _hostname:=$SICK_IP_REAR _port:=2112 _min_ang:=-1.57 _max_ang:=1.57 _frame_id:=laser_rear & \
+                         rosrun sick_tim sick_tim551_2050001 scan:=/scan_front __name:=laser_front _hostname:=$SICK_IP_FRONT _port:=2112 _min_ang:=-0.6 _max_ang:=0.6 _frame_id:=laser_front"]
