@@ -1,0 +1,24 @@
+global_frame: map
+robot_base_frame: base_link
+obstacle_range: 2.5
+raytrace_range: 3.0
+footprint: [[-0.55,0.33], [0.75,0.33], [0.75,-0.32], [-0.55,-0.32]]
+# robot_radius: ir_of_robot
+# inflation_radius: 0.15
+
+# uncomment to take in calculations of picco_flexx for the costmap.
+# TODO: use unimplemented filter to take out noise
+
+# observation_sources: laser_scan_sensor_front laser_scan_sensor_rear
+# observation_sources: velodyne_puck laser_scan_sensor_front laser_scan_sensor_rear
+
+observation_sources: laser_scan_merged
+laser_scan_merged: {sensor_frame: base_link, data_type: LaserScan, topic: /scan_merged, marking: true, clearing: true}
+
+# laser_scan_sensor_front: {sensor_frame: laser_front, data_type: LaserScan, topic: /scan_front, marking: true, clearing: true}
+
+# laser_scan_sensor_rear: {sensor_frame: laser_rear, data_type: LaserScan, topic: /scan_rear, marking: true, clearing: true}
+
+# velodyne_puck: {sensor_frame: velodyne, data_type: PointCloud2, topic: /points_no_robot, marking: true, clearing: true}
+
+#point_cloud_realsense: {sensor_frame: camera_link, data_type: PointCloud2, topic: /camera/depth_registered/points, marking: true, clearing: true}

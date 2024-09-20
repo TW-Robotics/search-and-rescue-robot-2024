@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+    <node pkg="comehome_pose_tf2" type="comehome_tf_transform.py" name="comehome_globalpose_tf" output="screen">
+        <!--param name="robot_tf" value="robot"/>
+        <param name="map_tf" value="test"/-->
+    </node>
+
+</launch>

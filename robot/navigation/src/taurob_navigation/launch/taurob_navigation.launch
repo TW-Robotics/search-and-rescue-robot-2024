@@ -1,0 +1,31 @@
+﻿<?xml version="1.0"?>
+<launch>
+
+  <arg name="replan" default="true" />
+  <remap from="cmd_vel" to="move_base/cmd_vel" />
+
+  <!-- Move Base Flex -->
+  <node pkg="mbf_costmap_nav" type="mbf_costmap_nav" respawn="true" name="move_base_flex" output="log">
+    <param name="tf_timeout" value="1.5" />
+    <param name="planner_max_retries" value="3" />
+    <rosparam file="$(find taurob_navigation)/configuration/planners.yaml" command="load" />
+    <rosparam file="$(find taurob_navigation)/configuration/controllers.yaml" command="load" />
+    <rosparam file="$(find taurob_navigation)/configuration/recovery_behaviors.yaml" command="load" />
+    <rosparam file="$(find taurob_navigation)/configuration/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find taurob_navigation)/configuration/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find taurob_navigation)/configuration/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find taurob_navigation)/configuration/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find taurob_navigation)/configuration/costmap_converter_params.yaml" command="load" />
+    <param name="controller_frequency" value="5.0" />
+    <param name="controller_patience" value="5.0" />
+  </node>
+
+  <group if="$(arg replan)">
+    <node pkg="taurob_navigation" type="taurob_smach_replan.py" respawn="true" name="taurob_smach" output="screen" />
+  </group>
+
+  <group unless="$(arg replan)">
+    <node pkg="taurob_navigation" type="taurob_smach.py" respawn="true" name="taurob_smach" output="screen" />
+  </group>
+
+</launch> 

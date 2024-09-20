@@ -1,0 +1,22 @@
+recovery_behaviors:
+  - name: 'rotate_recovery'
+    type: 'rotate_recovery/RotateRecovery'
+  - name: 'clear_costmap'
+    type: 'clear_costmap_recovery/ClearCostmapRecovery'
+  - name: 'moveback_recovery'
+    type: 'moveback_recovery/MoveBackRecovery'
+
+moveback_recovery:
+  linear_vel_back: -0.1 # default -0.3
+  step_back_length: 0.3  # default 1.0
+  step_back_timeout: 5.0 # default 15.0
+
+clear_costmap:
+  reset_distance: 1.0
+  #reset_distance: 3.0
+  #layer_names: ["obstacles"]
+
+rotate_recovery:
+  acc_lim_th: 0.02
+  max_rotational_vel: 0.25 
+  min_in_place_rotational_vel: 0.05

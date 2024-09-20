@@ -1,0 +1,41 @@
+﻿<?xml version="1.0"?>
+<package format="2">
+  <name>taurob_navigation</name>
+  <version>0.0.0</version>
+  <description>The taurob_navigation package</description>
+
+
+  <maintainer email="georg.novotny@technikum-wien.at">Georg Novotny</maintainer>
+  <author email="georg.novotny@technikum-wien.at">Georg Novotny</author>
+  <author email="florian.voglsinger@technikum-wien.at">Florian Voglsinger</author>
+  
+
+
+  <license>GPLv3</license>
+
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>smach</build_depend>
+  <build_depend>smach_ros</build_depend>
+  <build_export_depend>rospy</build_export_depend>
+  <build_export_depend>smach</build_export_depend>
+  <build_export_depend>smach_ros</build_export_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>smach</exec_depend>
+  <exec_depend>smach_ros</exec_depend>
+  <depend>mbf_msgs</depend>
+  <depend>mbf_costmap_nav</depend>
+  <depend>moveback_recovery</depend>
+  <depend>move_base</depend>
+  <depend>global_planner</depend>
+  <depend>teb_local_planner</depend>
+  <depend>dwa_local_planner</depend>
+  <depend>eband_local_planner</depend>
+
+
+  <export>
+    <!-- Other tools can request additional information be placed here -->
+
+  </export>
+</package>

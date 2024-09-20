@@ -1,0 +1,25 @@
+FROM ros:melodic-ros-base
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# hadolint ignore=DL3008
+RUN apt-get update && rosdep update \
+    && rm -rf /var/lib/apt/lists/* && apt-get clean
+ENV ROS_MASTER_URI="http://10.0.0.100:11311"
+ENV ROS_IP="10.0.0.100"
+ENV ROS_HOSTNAME="10.0.0.100"
+
+RUN mkdir -p /root/catkin_ws/src && \
+    /bin/bash -c '. /opt/ros/melodic/setup.bash; catkin_init_workspace'
+COPY src/taurob_navigation /root/catkin_ws/src/taurob_navigation
+
+WORKDIR /root/catkin_ws/
+RUN apt-get update && rosdep install --from-paths src --ignore-src --ignore-src -r -y && \
+    /bin/bash -c '. /opt/ros/melodic/setup.bash; catkin_make' \
+    && rm -rf /var/lib/apt/lists/* && apt-get clean
+
+# Remove config files to mount them dynamically on runtime
+RUN rm -rf /root/catkin_ws/src/taurob_navigation/configuration
+
+RUN sed -i '/setup.bash*/a source "\/root\/catkin_ws\/devel\/setup.bash"' /ros_entrypoint.sh
+CMD [ "source /opt/ros/melodic/setup.bash && source /root/catkin_ws/devel/setup.bash  && roslaunch ./src/taurob_navigation/launch/taurob_navigation.launch --wait" ]

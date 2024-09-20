@@ -1,0 +1,20 @@
+{
+    "mux": [
+        {
+            "name": "mux_goalpose",
+            "dt": 1,
+            "cooldownCycles": 0,
+            "dType": "PoseStamped",
+            "topics": ["preempted/goalpose", "rviz/goal", "click_and_go/goalpose", "explorer/goalpose"],
+            "outTopic": "mux/goal"
+        },
+        {
+            "name": "mux_cmd_vel",
+            "dt": 0.01,
+            "cooldownCycles": 500,
+            "dType": "Twist",
+            "topics": ["teleop/cmd_vel", "move_base/cmd_vel"],
+            "outTopic": "cmd_vel"
+        }
+    ]
+}

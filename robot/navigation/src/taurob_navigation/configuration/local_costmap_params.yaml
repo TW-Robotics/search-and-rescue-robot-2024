@@ -1,0 +1,35 @@
+local_costmap:
+  global_frame: map
+  #robot_base_frame: base_link
+  update_frequency: 5.0
+  publish_frequency: 2.0
+  static_map: false
+  rolling_window: true
+  width: 6.0
+  height: 6.0
+  resolution: 0.05
+  plugins: 
+  - name: static_map
+    type: "costmap_2d::StaticLayer"
+  - name: obstacles
+    type: "costmap_2d::VoxelLayer"
+  - name: inflation
+    type: "costmap_2d::InflationLayer"
+  
+  obstacles:
+    # observation_sources: velodyne_puck
+    # velodyne_puck: {sensor_frame: velodyne, data_type: PointCloud2, topic: /points_no_robot, marking: true, clearing: true}
+    # observation_sources: laser_scan_sensor_front laser_scan_sensor_rear
+    # observation_sources: laser_scan_merged
+    # laser_scan_sensor_front: {sensor_frame: laser_front, data_type: LaserScan, topic: /scan_frot, marking: true, clearing: true}
+    # laser_scan_sensor_rear: {sensor_frame: laser_rear, data_type: LaserScan, topic: /scan_rear, marking: true, clearing: true}
+    # laser_scan_merged: {sensor_frame: base_link, data_type: LaserScan, topic: /scan_merged, marking: true, clearing: true}
+    max_obstacle_height: 1.3
+    origin_z: 0.0
+    z_resolution: 0.08
+    z_voxels: 16
+    publish_voxel_map: true
+    unknown_threshold: 16
+    mark_threshold: 0
+  inflation:
+    inflation_radius: 0.05 #0.25

@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  taurob_navigation:
+    image: taurob/navigation:taurob_navigation
+    build:
+      context: ./
+      dockerfile: Dockerfile.navigation.taurob_navigation
+    volumes:
+      - ./src/taurob_navigation/configuration:/root/catkin_ws/src/taurob_navigation/configuration
+    command: roslaunch ./src/taurob_navigation/launch/taurob_navigation.launch --wait
+    network_mode: host
+
+  comehome_pose_tf2:
+    image: taurob/navigation:comehome_pose_tf2
+    build:
+      context: ./
+      dockerfile: Dockerfile.navigation.comehome_pose_tf2
+    command: roslaunch ./src/comehome_pose_tf2/launch/comehome_tf_transform.launch --wait
+    network_mode: host
+
+  mux:
+    image: taurob/navigation:mux
+    build:
+      context: ./
+      dockerfile: Dockerfile.navigation.mux
+    volumes:
+      - ./src/mux:/app
+    command: python3 /app/muxInstantiator.py
+    network_mode: host
+
+#  cmd_preempt:
+#    image: taurob/navigation:enrich_tools
+#    build:
+#      context: ./
+#      dockerfile: Dockerfile.navigation.enrich_tools
+#    volumes:
+#      - ./src/enrich_tools:/app
+#    command: python3 /app/preemptGoalFromCMD.py
+#    network_mode: host
+
+#  comehome_caller:
+#    image: taurob/navigation:enrich_tools
+#    build:
+#      context: ./
+#      dockerfile: Dockerfile.navigation.enrich_tools
+#    volumes:
+#      - ./src/enrich_tools:/app
+#    command: python3 /app/checkOperatorAndCallHome.py
+#    network_mode: host

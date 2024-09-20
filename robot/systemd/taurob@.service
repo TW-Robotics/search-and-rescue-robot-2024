@@ -1,0 +1,16 @@
+[Unit]
+Description=%i service with docker compose
+PartOf=docker.service
+After=docker.service
+After=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+WorkingDirectory=/home/mluser/git/taurob_tracker/robot/%i
+ExecStartPre=/bin/bash check_ros.sh %i
+ExecStart=/usr/bin/docker-compose -p %i up -d --remove-orphans
+ExecStop=/usr/bin/docker-compose down
+
+[Install]
+WantedBy=multi-user.target
