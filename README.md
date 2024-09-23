@@ -28,7 +28,7 @@ This work was supported by the Austrian Research Promotion Agency (FFG) through 
     <td align="middle" style="border: none;">
       <a href="https://arxiv.org/pdf/2406.14385" style="color: white; font-size: 14pt;">
         <div style="background-color: #363636; border-radius: 50px; padding: 10px 20px;">
-            <img src="img/document_icon.svg" height="14"> Paper
+            <img src="img/document_icon.png" height="14"> Paper
         </div>
       </a>
     </td>
